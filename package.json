@@ -1,0 +1,22 @@
+{
+  "name": "house-expense-manager",
+  "version": "1.0.0",
+  "description": "Shared House Expense Manager - Flutter frontend with Node.js backend",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "install": "cd backend && npm install",
+    "build": "echo 'Build complete'"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "expense-manager",
+    "flutter",
+    "nodejs",
+    "sqlite"
+  ],
+  "author": "Omar",
+  "license": "MIT"
+}
