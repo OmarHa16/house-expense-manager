@@ -1,0 +1,214 @@
+Project Title: Shared House Expense Manager (Android App + Local Server)
+
+Objective:
+Develop a full-stack application to track and split shared expenses among residents of a temporary house. The system consists of an Android client and a backend server running on a laptop (accessible via local Wi-Fi or optionally over the internet using free hosting). Users can log in, add invoices, specify who paid what and who consumed which items, and the app automatically calculates balances—who owes whom and how much. Admin users have additional privileges like deleting records and promoting other admins.
+
+Functional Requirements
+1. User Authentication
+Users sign in using a name and password.
+
+No registration flow is required initially; the admin can predefine users in the database (or the first user becomes admin and adds others).
+
+Session management: once logged in, the app remembers the user until they log out.
+
+2. User Roles
+Admin (default: Omar):
+
+Can delete any past records (invoices, items, payments).
+
+Can promote another user to admin.
+
+Has access to all data and can mark invoices as “done” (settled).
+
+Can remove users from the system (optional).
+
+Regular User:
+
+Can view their own balance, add new invoices, and see what they owe/to whom.
+
+Cannot delete records (except maybe their own pending items with undo option).
+
+3. Invoice Management
+Any user can add a new invoice.
+
+Each invoice contains:
+
+A list of items (e.g., “milk”, “bread”).
+
+For each item: price per unit, quantity, and a list of users who consumed it (e.g., “Omar, Omran, Saleem”).
+
+The total amount of the invoice is calculated automatically from items.
+
+Option to record who paid for the invoice (one or more users) and how much each paid (e.g., Saleem paid 30,000, Omar paid 20,000 for a 50,000 invoice).
+
+The system must store all items as reusable objects (i.e., a master list of items) so that when adding a new invoice, users can select from existing items or add a new one. This helps maintain consistency.
+
+4. Expense Calculation Logic
+The app must split the cost of each item among the users who consumed it.
+
+The total amount each user owes is the sum of their shares of all items.
+
+The total amount each user paid is recorded from invoice payments.
+
+The net balance for each user is: (amount paid) – (amount owed).
+
+If positive, the user should receive money from others.
+
+If negative, the user owes money to others.
+
+The app must display for each user:
+
+What they should pay (if net negative) and to whom.
+
+What they should receive (if net positive) and from whom.
+
+A “Done” button can be used to mark an invoice as settled (once all related debts are cleared). Only the admin can mark an invoice as done, or any user with confirmation.
+
+5. User Interface
+Login screen: Name and password.
+
+Home screen / Dashboard:
+
+For the logged-in user:
+
+Total amount they owe / are owed.
+
+Detailed list: “You owe X to Y” and “You should receive Z from W”.
+
+A button to “Add New Invoice”.
+
+A list of recent invoices (with status: pending/done).
+
+Add Invoice screen:
+
+Step-by-step or form:
+
+Add items: select from existing items (with price per unit) or create a new item. For each item, specify quantity and select consumers (multiple selection from user list).
+After adding all items, the total is shown.
+Enter payment details: who paid how much (can be split among multiple users).
+Submit invoice.
+Admin panel (visible only to admins):
+
+List all users, option to promote to admin.
+
+List all invoices, with delete buttons.
+
+“Undo” option for delete (visible for 10 seconds after deletion).
+
+Undo delete: When an admin deletes a record (invoice or item), a temporary undo button appears for 10 seconds. After that, deletion is permanent.
+
+6. Data Persistence & Reusability
+Items are stored as objects with properties: name, default price per unit (optional), and perhaps a category. When adding an invoice, users can pick from this list.
+
+Users are stored with name, hashed password, and admin flag.
+
+Invoices contain references to items, consumers, and payments.
+
+7. Additional Requirements
+The app must work over local Wi‑Fi (server on laptop). Optionally, if possible, deploy backend on a free internet host (e.g., Heroku, PythonAnywhere, or a free tier cloud) to allow access from outside the local network.
+
+The Android app should be built with a modern UI (Material Design) and be intuitive.
+
+All calculations must be accurate and real‑time.
+
+Technical Specifications
+Backend Server
+Platform: Any lightweight framework (Node.js/Express, Python/Flask, or PHP).
+
+Database: SQLite (for simplicity) or MySQL/PostgreSQL if hosted.
+
+API: RESTful endpoints for:
+
+Authentication (login, session token).
+
+User management (list, promote, delete – admin only).
+
+Item management (CRUD).
+
+Invoice management (create, read, delete – with undo support).
+
+Balance calculation (endpoint to get user-specific balances).
+
+Hosting: Initially on the developer’s laptop, accessible via IP on local network. Optionally, deploy on a free internet host (provide instructions).
+
+Android Client
+Language: Kotlin (preferred) or Java.
+
+Network: Use Retrofit or similar to communicate with the backend.
+
+Local storage: Possibly cache items and users for offline use? (Not required initially, but nice to have).
+
+UI: Follow Material Design guidelines. Use RecyclerView for lists, clear typography, and intuitive navigation.
+
+Data Models (Examples)
+User
+
+id (int)
+
+name (string)
+
+password_hash (string)
+
+is_admin (boolean)
+
+Item
+
+id (int)
+
+name (string)
+
+default_price (float, optional) – can be overridden per invoice.
+
+Invoice
+
+id (int)
+
+date (timestamp)
+
+created_by (user_id)
+
+is_done (boolean)
+
+InvoiceItem
+
+id (int)
+
+invoice_id
+
+item_id (or custom item name if new)
+
+price_per_unit (float)
+
+quantity (float)
+
+consumers (string or JSON array of user_ids) – e.g., "[1,3,5]"
+
+Payment
+
+id (int)
+
+invoice_id
+
+user_id (who paid)
+
+amount_paid (float)
+
+Deliverables
+Backend server code with setup instructions (including how to run on laptop and, optionally, deploy to free host).
+
+Android app source code (Android Studio project).
+
+API documentation (simple README with endpoint details).
+
+Database schema (SQL dump or migration scripts).
+
+Instructions for initial setup: creating the first admin user (Omar) and adding other users.
+
+Notes
+Prioritise core functionality first: authentication, adding invoices with items/consumers, and balance calculation.
+
+The undo feature can be implemented using a soft‑delete with a timestamp and a background job that permanently deletes after 10 seconds (or simply a timer on the client that shows undo option and calls an API to restore).
+
+Make sure all sensitive data (passwords) are hashed on the server.
+
+The app should handle multiple users concurrently; the server must manage state correctly.
